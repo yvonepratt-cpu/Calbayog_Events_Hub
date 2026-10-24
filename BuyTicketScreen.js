@@ -1,4 +1,4 @@
-// BuyTicketScreen.js
+
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -28,11 +28,9 @@ export default function BuyTicketScreen({ navigation, route }) {
     };
 
     try {
-      // Retrieve existing bookings
       const existingBookingsJSON = await AsyncStorage.getItem('@my_bookings');
       const existingBookings = existingBookingsJSON ? JSON.parse(existingBookingsJSON) : [];
       
-      // Append new booking
       const updatedBookings = [newBooking, ...existingBookings];
       await AsyncStorage.setItem('@my_bookings', JSON.stringify(updatedBookings));
 
