@@ -1,52 +1,51 @@
-// App.js
-import React from 'react'; // Import React core library
-import { NavigationContainer } from '@react-navigation/native'; // Import container managing navigation state
-import { createNativeStackNavigator } from '@react-navigation/native-stack'; // Import stack navigator builder
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'; // Import bottom tab navigator builder
-import { Ionicons } from '@expo/vector-icons'; // Import icon set for tab bar elements
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons';
 
-import HomeScreen from './HomeScreen'; // Import Home dashboard screen component
-import EventListScreen from './EventListScreen'; // Import screen listing all events
-import EventDetailsScreen from './EventDetailsScreen'; // Import screen showing event details
-import BuyTicketScreen from './BuyTicketScreen'; // Import screen handling ticket purchase
-import MyBookingsScreen from './MyBookingsScreen'; // Import screen displaying user bookings
+import HomeScreen from './HomeScreen';
+import EventListScreen from './EventListScreen';
+import EventDetailsScreen from './EventDetailsScreen';
+import BuyTicketScreen from './BuyTicketScreen';
+import MyBookingsScreen from './MyBookingsScreen';
 
-const Stack = createNativeStackNavigator(); // Initialize stack navigator instance
-const Tab = createBottomTabNavigator(); // Initialize tab navigator instance
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
-// Stack navigator grouping the event browsing and booking screens
+// Stack Navigator for the Events exploration flow
 function EventStack() {
   return (
-    <Stack.Navigator initialRouteName="Home"> {/* Set Home as the initial route */}
-      <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} /> {/* Home screen with hidden header */}
-      <Stack.Screen name="Events" component={EventListScreen} options={{ title: 'Explore Events' }} /> {/* Events list screen */}
-      <Stack.Screen name="EventDetails" component={EventDetailsScreen} options={{ title: 'Event Details' }} /> {/* Event details screen */}
-      <Stack.Screen name="BuyTicket" component={BuyTicketScreen} options={{ title: 'Book Ticket' }} /> {/* Ticket booking screen */}
+    <Stack.Navigator initialRouteName="Home">
+      <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Events" component={EventListScreen} options={{ title: 'Explore Events' }} />
+      <Stack.Screen name="EventDetails" component={EventDetailsScreen} options={{ title: 'Event Details' }} />
+      <Stack.Screen name="BuyTicket" component={BuyTicketScreen} options={{ title: 'Book Ticket' }} />
     </Stack.Navigator>
   );
 }
 
-// Root application component rendering bottom tabs
+// Root App with Bottom Tab Navigation
 export default function App() {
   return (
-    <NavigationContainer> {/* Provide navigation tree context */}
+    <NavigationContainer>
       <Tab.Navigator
         screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => { // Render dynamic icons based on focus
+          tabBarIcon: ({ focused, color, size }) => {
             let iconName;
             if (route.name === 'Explore') {
-              iconName = focused ? 'calendar' : 'calendar-outline'; // Toggle calendar icon
+              iconName = focused ? 'calendar' : 'calendar-outline';
             } else if (route.name === 'My Bookings') {
-              iconName = focused ? 'ticket' : 'ticket-outline'; // Toggle ticket icon
+              iconName = focused ? 'ticket' : 'ticket-outline';
             }
-            return <Ionicons name={iconName} size={size} color={color} />; // Return configured icon
+            return <Ionicons name={iconName} size={size} color={color} />;
           },
-          tabBarActiveTintColor: '#0066FF', // Active tab tint color
-          tabBarInactiveTintColor: 'gray', // Inactive tab tint color
+          tabBarActiveTintColor: '#0066FF',
+          tabBarInactiveTintColor: 'gray',
         })}
       >
-        <Tab.Screen name="Explore" component={EventStack} options={{ headerShown: false }} /> {/* Explore tab wrapping event stack */}
-        <Tab.Screen name="My Bookings" component={MyBookingsScreen} options={{ title: 'Saved Tickets' }} /> {/* Bookings tab */}
+        <Tab.Screen name="Explore" component={EventStack} options={{ headerShown: false }} />
+        <Tab.Screen name="My Bookings" component={MyBookingsScreen} options={{ title: 'Saved Tickets' }} />
       </Tab.Navigator>
     </NavigationContainer>
   );
