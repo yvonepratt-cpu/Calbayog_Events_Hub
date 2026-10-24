@@ -1,5 +1,5 @@
-// MyBookingsScreen.js
-import React, { useState, useEffect, useCallback } from 'react';
+
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
@@ -7,7 +7,7 @@ import { useFocusEffect } from '@react-navigation/native';
 export default function MyBookingsScreen() {
   const [bookings, setBookings] = useState([]);
 
-  // Load bookings whenever screen comes into focus
+  // Reload bookings whenever screen comes into focus
   useFocusEffect(
     useCallback(() => {
       loadBookings();
