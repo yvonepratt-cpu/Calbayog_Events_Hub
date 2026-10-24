@@ -1,4 +1,4 @@
-// EventListScreen.js
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 
@@ -15,16 +15,16 @@ export default function EventListScreen({ navigation }) {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      // Simulated or real API fetch (Using JSONPlaceholder posts mapped as events for demonstration)
-      const response = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=5');
+      // Fetching mock event data from public API
+      const response = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=4');
       if (!response.ok) throw new Error('Failed to fetch events from server.');
       
       const data = await response.json();
       
-      // Map API response to match our Calbayog Event structure
+      // Map API response to match Calbayog Events structure
       const formattedEvents = data.map((item, index) => ({
         id: String(item.id),
-        name: item.title.slice(0, 25) + '...',
+        name: index === 0 ? 'Calbayog Music Night' : index === 1 ? 'Campus Indie Gig' : item.title.slice(0, 22) + '...',
         date: `November ${10 + index}, 2026`,
         venue: index % 2 === 0 ? 'City Events Hall, Calbayog' : 'University Activity Center',
         price: `PHP ${150 + (index * 50)}`,
@@ -62,7 +62,7 @@ export default function EventListScreen({ navigation }) {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.heading}>Upcoming Events (API)</Text>
+      <Text style={styles.heading}>Upcoming Events</Text>
       
       {events.map((event) => (
         <TouchableOpacity 
