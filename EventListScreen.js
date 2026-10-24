@@ -1,42 +1,78 @@
-// Import React library from react package
-import React from 'react';
-// Import core layout and UI components from react-native
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+// EventListScreen.js
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 
-// Array containing list objects for mock upcoming event data
-const events = [
-  // First event item object with id, date, name, venue, and price properties
-  { id: '1', date: 'October 10, 2026', name: 'Calbayog Music Night',venue: 'City Events Hall', price: 'PHP 250' },
-  // Second event item object with id, name, date, venue, and price properties
-  { id: '2', name: 'Campus Indie Gig', date: 'October 17, 2026', venue: 'University Activity Center', price: 'PHP 200' },
-  // Third event item object with id, name, date, venue, and price properties
-  { id: '3', name: 'Weekend Acoustic Night', date: 'October 24, 2026', venue: 'Downtown Music Hall', price: 'PHP 150' },
-];
+export default function EventListScreen({ navigation }) {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-// Export default functional component EventsScreen receiving navigation prop
-export default function EventsScreen({ navigation }) {
-  // Return JSX template structure
-  return (
-    /* Scrollable container view with styles applied */
-    <ScrollView style={styles.container}>
-      {/* Render heading text for the events list */}
-      <Text style={styles.heading}>Upcoming Events</Text>
+  // Lifecycle hook: Fetch events on component mount
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      // Simulated or real API fetch (Using JSONPlaceholder posts mapped as events for demonstration)
+      const response = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=5');
+      if (!response.ok) throw new Error('Failed to fetch events from server.');
       
-      {/* Iterate through events array using map function to render event cards dynamically */}
+      const data = await response.json();
+      
+      // Map API response to match our Calbayog Event structure
+      const formattedEvents = data.map((item, index) => ({
+        id: String(item.id),
+        name: item.title.slice(0, 25) + '...',
+        date: `November ${10 + index}, 2026`,
+        venue: index % 2 === 0 ? 'City Events Hall, Calbayog' : 'University Activity Center',
+        price: `PHP ${150 + (index * 50)}`,
+        numericPrice: 150 + (index * 50),
+      }));
+
+      setEvents(formattedEvents);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color="#0066FF" />
+        <Text style={styles.loadingText}>Loading Calbayog Events...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.centerContainer}>
+        <Text style={styles.errorText}>Error: {error}</Text>
+        <TouchableOpacity style={styles.retryButton} onPress={fetchEvents}>
+          <Text style={styles.retryText}>Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView style={styles.container}>
+      <Text style={styles.heading}>Upcoming Events (API)</Text>
+      
       {events.map((event) => (
-        /* Touchable card component that triggers navigation on press */
         <TouchableOpacity 
           key={event.id} 
           style={styles.card}
           onPress={() => navigation.navigate('EventDetails', { event })}
         >
-          {/* Display event title/name text */}
           <Text style={styles.eventName}>{event.name}</Text>
-          {/* Display event date text */}
           <Text style={styles.eventDetails}>{event.date}</Text>
-          {/* Display event venue location text */}
           <Text style={styles.eventDetails}>{event.venue}</Text>
-          {/* Display event ticket price text */}
           <Text style={styles.eventPrice}>{event.price}</Text>
         </TouchableOpacity>
       ))}
@@ -44,18 +80,16 @@ export default function EventsScreen({ navigation }) {
   );
 }
 
-// Create stylesheet configuration object
 const styles = StyleSheet.create({
-  // Root container screen layout styling
   container: { flex: 1, padding: 20, backgroundColor: '#fff' },
-  // Screen title header text styling
+  centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
   heading: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-  // Event item card container box styling
-  card: { borderWidth: 1, borderColor: '#333', padding: 16, borderRadius: 4, marginBottom: 15 },
-  // Card event title name font styling
-  eventName: { fontSize: 18, fontWeight: 'bold', marginBottom: 4 },
-  // Card detail labels font and color styling
+  card: { borderWidth: 1, borderColor: '#333', padding: 16, borderRadius: 6, marginBottom: 15, backgroundColor: '#f9f9f9' },
+  eventName: { fontSize: 18, fontWeight: 'bold', marginBottom: 4, color: '#0066FF' },
   eventDetails: { fontSize: 14, color: '#444', marginBottom: 2 },
-  // Card price tag bold text styling
-  eventPrice: { fontSize: 16, fontWeight: 'bold', marginTop: 6 },
+  eventPrice: { fontSize: 16, fontWeight: 'bold', marginTop: 6, color: '#222' },
+  loadingText: { marginTop: 10, fontSize: 16, color: '#666' },
+  errorText: { fontSize: 16, color: 'red', textAlign: 'center', marginBottom: 15 },
+  retryButton: { backgroundColor: '#0066FF', padding: 12, borderRadius: 4 },
+  retryText: { color: '#fff', fontWeight: 'bold' },
 });
