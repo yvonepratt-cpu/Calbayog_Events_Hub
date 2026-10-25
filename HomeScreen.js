@@ -1,60 +1,44 @@
-// Import React library from react package
-import React from 'react';
-// Import core layout, text, touch, and styling components from react-native
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
-// Export default functional component HomeScreen receiving navigation prop
-export default function HomeScreen({ navigation }) {
-  // Return JSX layout structure
+import React from 'react'; // Import React core library
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'; // Import core React Native components and styling tools
+
+export default function HomeScreen({ navigation }) { // Define and export HomeScreen component receiving navigation prop
   return (
-    /* Main container view with top-aligned flex layout and padding */
-    <View style={styles.container}>
-      {/* Centered Main Title */}
-      <Text style={styles.heading}>CALBAYOG EVENTS HUB</Text>
-
-      {/* Render subheading text describing screen purpose */}
-      <Text style={styles.subheading}>
-        Browse upcoming local events, view ticket details, and save dates to attend.
+    <View style={styles.container}> {/* Root container view */}
+      <Text style={styles.heading}>CALBAYOG EVENTS HUB</Text> {/* Main title heading */}
+      <Text style={styles.subheading}> {/* Subheading container */}
+        Browse upcoming local events, view ticket details, and save dates to attend. {/* Descriptive subtitle text */}
       </Text>
-
-      {/* Touchable opacity button to trigger navigation to Events screen */}
-      <TouchableOpacity 
-        style={styles.button} 
-        onPress={() => navigation.navigate('Events')}
+      <TouchableOpacity  
+        style={styles.button} // Touchable button styling 
+        onPress={() => navigation.navigate('Events')} // Navigate to Events screen on press
       >
-        {/* Label text inside button */}
-        <Text style={styles.buttonText}>Browse Events</Text>
+        <Text style={styles.buttonText}>Browse Events</Text> {/* Button label text */}
       </TouchableOpacity>
     </View>
   );
 }
 
-// Create stylesheet object for styling components
 const styles = StyleSheet.create({
-  // Container styling filling full screen space with white background
-  container: { flex: 1, padding: 20, backgroundColor: '#fff', justifyContent: 'flex-start' },
-  // Heading text styling
-  heading: { 
-    fontSize: 26, 
-    fontWeight: 'bold', 
-    textAlign: 'center', // Centers the title horizontally
-    marginVertical: 15,
+  container: { flex: 1, padding: 20, backgroundColor: '#fff', justifyContent: 'flex-start' }, // Root container layout style
+  heading: {  
+    fontSize: 26, // Heading font size
+    fontWeight: 'bold', // Heading font weight
+    textAlign: 'center', // Center-align heading text
+    marginVertical: 15, // Vertical margins for heading
   },
-  // Subheading text styling
-  subheading: { 
-    fontSize: 16, 
-    color: '#333', 
-    textAlign: 'center', // Centers the description text
-    marginBottom: 25, 
-    lineHeight: 22,
+  subheading: {  
+    fontSize: 16, // Subheading font size
+    color: '#333', // Subheading text color
+    textAlign: 'center', // Center-align subheading text
+    marginBottom: 25, // Bottom margin spacing
+    lineHeight: 22, // Line height for readable spacing
   },
-  // Primary button container styling
-  button: { 
-    backgroundColor: '#0000FF', 
-    padding: 15, 
-    borderRadius: 4, 
-    alignItems: 'center' 
+  button: {  
+    backgroundColor: '#0000FF', // Button background color
+    padding: 15, // Inner padding for button
+    borderRadius: 4, // Rounded corners for button
+    alignItems: 'center' // Center-align button content
   },
-  // Button text font and color styling
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: '500' },
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: '500' }, // Button label text styles
 });
