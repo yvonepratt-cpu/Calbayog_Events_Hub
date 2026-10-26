@@ -1,144 +1,175 @@
-
+// BuyTicketScreen.js
 import React, { useState } from 'react'; // Import React core and useState hook
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native'; // Import core UI components and Alert module
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Import local device storage library
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native'; // Import core React Native UI components
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage for local data persistence
+import { Ionicons } from '@expo/vector-icons'; // Import Ionicons for vector icons
 
-export default function BuyTicketScreen({ navigation, route }) { // Define and export BuyTicketScreen component receiving navigation and route props
-  const event = route?.params?.event || { // Extract passed event or use default fallback object
-    name: 'Calbayog Music Night', // Fallback event name
-    date: 'October 10, 2026', // Fallback event date
-    venue: 'City Events Hall', // Fallback event venue
-    numericPrice: 250, // Fallback numeric price
+export default function BuyTicketScreen({ route, navigation }) { // Define and export BuyTicketScreen component receiving route and navigation props
+  const { event } = route.params; // Extract event object from navigation route parameters
+  const [quantity, setQuantity] = useState(1); // Initialize ticket quantity state with default value 1
+
+  const activeColor = event.accentColor || '#0066FF'; // Set active theme color using event accent color or fallback
+
+  const increaseQuantity = () => setQuantity(prev => prev + 1); // Function to increment ticket quantity
+  const decreaseQuantity = () => { // Function to decrement ticket quantity with lower limit of 1
+    if (quantity > 1) setQuantity(prev => prev - 1);
   };
 
-  const unitPrice = event.numericPrice || ( // Extract or calculate unit price per ticket
-    event.price ? parseInt(String(event.price).match(/\d+/)[0], 10) : 250
-  );
+  const totalPrice = event.numericPrice * quantity; // Calculate total price based on unit price and quantity
 
-  const [quantity, setQuantity] = useState(1); // Initialize ticket quantity state with a default value of 1
+  const handleConfirmPurchase = async () => { // Asynchronous function to handle purchase confirmation and saving
+    // Format full date and time stamp
+    const now = new Date(); // Get current date and time instance
+    const formattedDateTime = now.toLocaleDateString('en-US', { // Format current date string
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }) + ' at ' + now.toLocaleTimeString('en-US', { // Format current time string with 12-hour format
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
 
-  const handleConfirmAndPay = async () => { // Asynchronous function to process payment and save booking
-    const totalPrice = unitPrice * quantity; // Calculate total price based on unit price and quantity
-    const newBooking = { // Construct new booking record object
-      id: Date.now().toString(), // Generate unique string ID using current timestamp
-      name: event.name, // Event name
+    const booking = { // Construct booking record object
+      id: Date.now().toString(), // Generate unique ID string using current timestamp
+      eventName: event.name, // Event name
       date: event.date, // Event date
       venue: event.venue, // Event venue
-      quantity, // Purchased quantity
-      totalPrice, // Total amount paid
-      bookedAt: new Date().toLocaleString(), // Formatted timestamp for booking date/time
+      quantity, // Ticket quantity
+      totalPrice: `PHP ${totalPrice}`, // Formatted total price string
+      bookingDate: formattedDateTime, // Saved with exact Date & Time timestamp
+      accentColor: activeColor, // Accent color for styling
     };
 
     try {
-      const existingBookingsJSON = await AsyncStorage.getItem('@my_bookings'); // Retrieve existing bookings from storage
-      const existingBookings = existingBookingsJSON ? JSON.parse(existingBookingsJSON) : []; // Parse stored JSON or default to empty array
+      const existingBookings = await AsyncStorage.getItem('@my_bookings'); // Retrieve existing bookings from local storage
+      const bookings = existingBookings ? JSON.parse(existingBookings) : []; // Parse stored bookings or default to empty array
+      const updatedBookings = [booking, ...bookings]; // Prepend new booking to array
       
-      const updatedBookings = [newBooking, ...existingBookings]; // Prepend new booking to existing list
-      await AsyncStorage.setItem('@my_bookings', JSON.stringify(updatedBookings)); // Save updated list back to device storage
+      await AsyncStorage.setItem('@my_bookings', JSON.stringify(updatedBookings)); // Save updated bookings array to local storage
 
-      Alert.alert( // Show success confirmation alert dialog
-        "Ticket Confirmed!",
-        `Event: ${event.name}\nTickets: ${quantity} x (PHP ${unitPrice})\nTotal Paid: PHP ${totalPrice}`,
+      Alert.alert( // Show success alert dialog
+        'Success!', 
+        `You have successfully booked ${quantity} ticket(s) for ${event.name}.`,
         [
-          {
-            text: "View My Bookings",
-            onPress: () => navigation.navigate('My Bookings') // Navigate to bookings screen on press
+          { 
+            text: 'View My Bookings', 
+            onPress: () => navigation.navigate('My Bookings') // Navigate to My Bookings screen on press
           }
         ]
       );
-    } catch (error) {
-      Alert.alert("Error", "Failed to save booking to device storage."); // Show error alert if storage fails
+    } catch (e) {
+      Alert.alert('Error', 'Failed to save booking. Please try again.'); // Show error alert if saving fails
     }
   };
 
   return (
-    <View style={styles.container}> {/* Root container layout view */}
-      <Text style={styles.heading}>Buy Ticket</Text> {/* Main heading text */}
+    <ScrollView style={styles.container}> {/* Root scrollable container view */}
+      <View style={[styles.card, { borderTopColor: activeColor }]}> {/* Card container with dynamic top accent border */}
+        <Text style={styles.headerTitle}>Complete Your Booking</Text> {/* Section header title text */}
+        <Text style={[styles.eventName, { color: activeColor }]}>{event.name}</Text> {/* Event name text with dynamic accent color */}
+        <Text style={styles.eventPrice}>{event.price} per ticket</Text> {/* Unit price display text */}
 
-      <View style={styles.ticketCard}> {/* Ticket summary preview card container */}
-        <View style={styles.ticketHeader}>
-          <Text style={styles.ticketTitle}>{event.name}</Text> {/* Event title inside card */}
-          <Text style={styles.ticketBadge}>ADMIT {quantity}</Text> {/* Admission count badge */}
-        </View>
-        
-        <View style={styles.ticketBody}>
-          <Text style={styles.ticketSublabel}>DATE & TIME</Text> {/* Date section label */}
-          <Text style={styles.ticketValue}>{event.date}</Text> {/* Event date value */}
+        <View style={styles.divider} /> {/* Divider line */}
 
-          <Text style={styles.ticketSublabel}>VENUE</Text> {/* Venue section label */}
-          <Text style={styles.ticketValue}>{event.venue}</Text> {/* Event venue value */}
-        </View>
-      </View>
-
-      <View style={styles.infoRow}>
-        <Text style={styles.label}>Price per Ticket:</Text> {/* Unit price label */}
-        <Text style={styles.value}>PHP {unitPrice}</Text> {/* Unit price value */}
-      </View>
-
-      <View style={styles.qtyRow}>
-        <Text style={styles.label}>Quantity:</Text> {/* Quantity selection label */}
-        <View style={styles.counter}>
+        {/* Quantity Selector */}
+        <Text style={styles.sectionLabel}>Select Quantity</Text> {/* Quantity selection section label */}
+        <View style={styles.counterContainer}> {/* Counter control box container */}
           <TouchableOpacity 
-            style={styles.qtyBtn} 
-            onPress={() => setQuantity(Math.max(1, quantity - 1))} // Decrease quantity with minimum limit of 1
+            style={[styles.counterBtn, { backgroundColor: activeColor }]} // Decrease button style with dynamic background color
+            onPress={decreaseQuantity} // Decrease quantity handler
+            activeOpacity={0.7} // Active touch opacity feedback
           >
-            <Text style={styles.qtyBtnText}>-</Text> {/* Minus symbol */}
+            <Ionicons name="remove" size={20} color="#fff" /> {/* Minus icon */}
           </TouchableOpacity>
-
-          <Text style={styles.qtyText}>{quantity}</Text> {/* Current quantity display */}
-
+          
+          <Text style={styles.quantityText}>{quantity}</Text> {/* Current quantity number display */}
+          
           <TouchableOpacity 
-            style={styles.qtyBtn} 
-            onPress={() => setQuantity(quantity + 1)} // Increase quantity on press
+            style={[styles.counterBtn, { backgroundColor: activeColor }]} // Increase button style with dynamic background color
+            onPress={increaseQuantity} // Increase quantity handler
+            activeOpacity={0.7} // Active touch opacity feedback
           >
-            <Text style={styles.qtyBtnText}>+</Text> {/* Plus symbol */}
+            <Ionicons name="add" size={20} color="#fff" /> {/* Plus icon */}
           </TouchableOpacity>
         </View>
+
+        {/* Price Summary */}
+        <View style={styles.summaryContainer}> {/* Price summary row container */}
+          <Text style={styles.summaryLabel}>Total Amount:</Text> {/* Total amount label */}
+          <Text style={[styles.summaryPrice, { color: activeColor }]}>PHP {totalPrice}</Text> {/* Total price value with dynamic color */}
+        </View>
+
+        {/* Confirm Button */}
+        <TouchableOpacity 
+          style={[styles.confirmButton, { backgroundColor: activeColor }]} // Confirm button style with dynamic background color
+          onPress={handleConfirmPurchase} // Trigger purchase confirmation handler
+          activeOpacity={0.8} // Active touch opacity feedback
+        >
+          <Text style={styles.confirmButtonText}>Confirm & Pay</Text> {/* Button label text */}
+          <Ionicons name="checkmark-circle-outline" size={20} color="#fff" style={{ marginLeft: 6 }} /> {/* Checkmark icon */}
+        </TouchableOpacity>
       </View>
-
-      <View style={styles.infoRow}>
-        <Text style={styles.label}>Total Amount:</Text> {/* Total amount label */}
-        <Text style={styles.totalValue}>PHP {unitPrice * quantity}</Text> {/* Calculated total price value */}
-      </View>
-
-      <TouchableOpacity 
-        style={styles.confirmBtn} 
-        onPress={handleConfirmAndPay} // Trigger payment and storage confirmation on press
-      >
-        <Text style={styles.btnText}>Confirm & Pay</Text> {/* Confirm button text */}
-      </TouchableOpacity>
-
-      <TouchableOpacity 
-        style={styles.cancelBtn} 
-        onPress={() => navigation.goBack()} // Go back to the previous screen on press
-      >
-        <Text style={styles.cancelText}>Cancel</Text> {/* Cancel button text */}
-      </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff' }, // Root container style
-  heading: { fontSize: 24, fontWeight: 'bold', marginBottom: 15 }, // Heading style
-  ticketCard: { borderWidth: 1.5, borderColor: '#0066FF', backgroundColor: '#f8f9fa', borderRadius: 8, padding: 16, marginBottom: 20 }, // Ticket card style
-  ticketHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }, // Ticket card header style
-  ticketTitle: { fontSize: 18, fontWeight: 'bold', color: '#0066FF', flex: 1 }, // Ticket title typography style
-  ticketBadge: { backgroundColor: '#0066FF', color: '#fff', fontSize: 12, fontWeight: 'bold', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4 }, // Badge style
-  ticketBody: { marginTop: 4 }, // Ticket body style
-  ticketSublabel: { fontSize: 11, color: '#666', fontWeight: 'bold', marginTop: 6 }, // Ticket sublabel style
-  ticketValue: { fontSize: 15, color: '#222', fontWeight: '500' }, // Ticket value style
-  infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }, // Info row layout style
-  qtyRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 10 }, // Quantity row layout style
-  label: { fontSize: 16, fontWeight: '600' }, // Label text style
-  value: { fontSize: 16 }, // Value text style
-  totalValue: { fontSize: 20, fontWeight: 'bold', color: '#0066FF' }, // Total amount text style
-  counter: { flexDirection: 'row', alignItems: 'center' }, // Counter container style
-  qtyBtn: { backgroundColor: '#e0e0e0', width: 36, height: 36, borderRadius: 4, justifyContent: 'center', alignItems: 'center' }, // Counter button box style
-  qtyBtnText: { fontSize: 18, fontWeight: 'bold' }, // Counter button text style
-  qtyText: { marginHorizontal: 15, fontSize: 16, fontWeight: 'bold' }, // Counter number display style
-  confirmBtn: { backgroundColor: '#0066FF', paddingVertical: 14, borderRadius: 6, alignItems: 'center', marginTop: 15 }, // Confirm button style
-  cancelBtn: { backgroundColor: '#7F7F7F', paddingVertical: 14, borderRadius: 6, alignItems: 'center', marginTop: 10 }, // Cancel button style
-  btnText: { color: '#fff', fontSize: 16, fontWeight: 'bold' }, // Confirm button text style
-  cancelText: { color: '#fff', fontSize: 16, fontWeight: '500' }, // Cancel button text style
+  container: { flex: 1, padding: 20, backgroundColor: '#0f172a' }, // Root container style with dark background
+  card: { 
+    backgroundColor: '#1e293b', // Card background color
+    padding: 22, // Card inner padding
+    borderRadius: 14, // Rounded card corners
+    borderTopWidth: 6, // Top accent border width
+    borderWidth: 1, // Card border width
+    borderColor: '#334155', // Card border color
+  },
+  headerTitle: { fontSize: 14, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }, // Header title style
+  eventName: { fontSize: 24, fontWeight: 'bold', marginBottom: 4 }, // Event name typography style
+  eventPrice: { fontSize: 15, color: '#cbd5e1', marginBottom: 16 }, // Event price style
+  divider: { height: 1, backgroundColor: '#334155', marginVertical: 16 }, // Divider style
+  sectionLabel: { fontSize: 16, color: '#ffffff', fontWeight: 'bold', marginBottom: 12 }, // Section label style
+  counterContainer: { 
+    flexDirection: 'row', // Horizontal layout for counter elements
+    alignItems: 'center', // Center items vertically
+    justifyContent: 'center', // Center items horizontally
+    backgroundColor: '#0f172a', // Counter background color
+    borderRadius: 10, // Rounded counter container corners
+    padding: 12, // Counter inner padding
+    marginBottom: 20, // Bottom margin spacing
+    borderWidth: 1, // Counter border width
+    borderColor: '#334155' // Counter border color
+  },
+  counterBtn: { 
+    width: 42, // Counter button width dimension
+    height: 42, // Counter button height dimension
+    borderRadius: 8, // Rounded button corners
+    alignItems: 'center', // Center icon horizontally
+    justifyContent: 'center' // Center icon vertically
+  },
+  quantityText: { fontSize: 22, fontWeight: 'bold', color: '#ffffff', marginHorizontal: 28 }, // Quantity text display style
+  summaryContainer: { 
+    flexDirection: 'row', // Horizontal layout for summary elements
+    justifyContent: 'space-between', // Space out label and price
+    alignItems: 'center', // Center items vertically
+    paddingVertical: 14, // Vertical inner padding
+    borderTopWidth: 1, // Top border width
+    borderColor: '#334155', // Border color
+    marginBottom: 20 // Bottom margin spacing
+  },
+  summaryLabel: { fontSize: 16, color: '#94a3b8' }, // Summary label text style
+  summaryPrice: { fontSize: 24, fontWeight: 'bold' }, // Summary price text style
+  confirmButton: { 
+    flexDirection: 'row', // Horizontal layout for text and icon
+    paddingVertical: 16, // Vertical padding
+    borderRadius: 10, // Rounded button corners
+    alignItems: 'center', // Center items vertically
+    justifyContent: 'center', // Center items horizontally
+    shadowColor: '#000', // Shadow color
+    shadowOffset: { width: 0, height: 2 }, // Shadow offset dimensions
+    shadowOpacity: 0.3, // Shadow opacity
+    shadowRadius: 4, // Shadow blur radius
+    elevation: 4, // Android shadow elevation
+  },
+  confirmButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' }, // Confirm button label text style
 });
