@@ -1,22 +1,17 @@
 {
-  "name": "localeventgigboard",
-  "version": "1.0.0",
-  "main": "index.js",
   "dependencies": {
-    "@react-navigation/native": "^7.5.0",
-    "@react-navigation/native-stack": "^7.20.0",
-    "expo": "~57.0.26",
-    "expo-status-bar": "~57.0.1",
-    "react": "19.2.3",
-    "react-native": "0.86.3",
-    "react-native-safe-area-context": "~5.7.0",
-    "react-native-screens": "~4.26.0"
-  },
-  "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
-  },
-  "private": true
+    "@expo/metro-runtime": "~3.2.3", // Runtime environment library supporting Expo Metro bundler for web and development
+    "@react-native-async-storage/async-storage": "1.23.1", // Local device storage library for persisting user bookings and offline data
+    "@react-navigation/bottom-tabs": "^6.5.11", // Bottom tab navigation navigator for primary app sections
+    "@react-navigation/native": "^6.1.9", // Core infrastructure and container for React Navigation
+    "@react-navigation/native-stack": "^6.9.17", // Native stack navigator library for managing screen transitions hierarchically
+    "expo": "~51.0.0", // Core Expo SDK platform framework and tools package
+    "expo-status-bar": "~1.12.1", // Expo module for controlling and styling the mobile device status bar
+    "react": "18.2.0", // Core React library for building component-based user interfaces
+    "react-dom": "18.2.0", // React package for working with the DOM (supporting React Native Web)
+    "react-native": "0.74.5", // Core React Native framework for native cross-platform mobile app development
+    "react-native-safe-area-context": "4.10.5", // Utility library handling safe area insets for notched and modern mobile screens
+    "react-native-screens": "~3.31.1", // Native primitives library optimizing screen transitions and memory usage
+    "react-native-web": "~0.19.10" // Compatibility layer enabling React Native components to run seamlessly on web browsers
+  }
 }
