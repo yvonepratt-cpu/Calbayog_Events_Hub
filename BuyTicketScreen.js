@@ -1,12 +1,12 @@
-// BuyTicketScreen.js
+
 import React, { useState } from 'react'; // Import React core and useState hook
 import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native'; // Import core React Native UI components
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage for local data persistence
-import { Ionicons } from '@expo/vector-icons'; // Import Ionicons for vector icons
+import { Ionicons } from '@expo/vector-icons'; // Import vector icons library
 
 export default function BuyTicketScreen({ route, navigation }) { // Define and export BuyTicketScreen component receiving route and navigation props
   const { event } = route.params; // Extract event object from navigation route parameters
-  const [quantity, setQuantity] = useState(1); // Initialize ticket quantity state with default value 1
+  const [quantity, setQuantity] = useState(1); // Initialize ticket quantity state with 1
 
   const activeColor = event.accentColor || '#0066FF'; // Set active theme color using event accent color or fallback
 
@@ -18,7 +18,6 @@ export default function BuyTicketScreen({ route, navigation }) { // Define and e
   const totalPrice = event.numericPrice * quantity; // Calculate total price based on unit price and quantity
 
   const handleConfirmPurchase = async () => { // Asynchronous function to handle purchase confirmation and saving
-    // Format full date and time stamp
     const now = new Date(); // Get current date and time instance
     const formattedDateTime = now.toLocaleDateString('en-US', { // Format current date string
       month: 'short',
@@ -31,7 +30,7 @@ export default function BuyTicketScreen({ route, navigation }) { // Define and e
     });
 
     const booking = { // Construct booking record object
-      id: Date.now().toString(), // Generate unique ID string using current timestamp
+      id: Date.now().toString(), // Generate unique ID string using timestamp
       eventName: event.name, // Event name
       date: event.date, // Event date
       venue: event.venue, // Event venue
@@ -42,7 +41,7 @@ export default function BuyTicketScreen({ route, navigation }) { // Define and e
     };
 
     try {
-      const existingBookings = await AsyncStorage.getItem('@my_bookings'); // Retrieve existing bookings from local storage
+      const existingBookings = await AsyncStorage.getItem('@my_bookings'); // Retrieve existing bookings from storage
       const bookings = existingBookings ? JSON.parse(existingBookings) : []; // Parse stored bookings or default to empty array
       const updatedBookings = [booking, ...bookings]; // Prepend new booking to array
       
@@ -72,7 +71,6 @@ export default function BuyTicketScreen({ route, navigation }) { // Define and e
 
         <View style={styles.divider} /> {/* Divider line */}
 
-        {/* Quantity Selector */}
         <Text style={styles.sectionLabel}>Select Quantity</Text> {/* Quantity selection section label */}
         <View style={styles.counterContainer}> {/* Counter control box container */}
           <TouchableOpacity 
@@ -94,13 +92,11 @@ export default function BuyTicketScreen({ route, navigation }) { // Define and e
           </TouchableOpacity>
         </View>
 
-        {/* Price Summary */}
         <View style={styles.summaryContainer}> {/* Price summary row container */}
           <Text style={styles.summaryLabel}>Total Amount:</Text> {/* Total amount label */}
           <Text style={[styles.summaryPrice, { color: activeColor }]}>PHP {totalPrice}</Text> {/* Total price value with dynamic color */}
         </View>
 
-        {/* Confirm Button */}
         <TouchableOpacity 
           style={[styles.confirmButton, { backgroundColor: activeColor }]} // Confirm button style with dynamic background color
           onPress={handleConfirmPurchase} // Trigger purchase confirmation handler
@@ -140,13 +136,7 @@ const styles = StyleSheet.create({
     borderWidth: 1, // Counter border width
     borderColor: '#334155' // Counter border color
   },
-  counterBtn: { 
-    width: 42, // Counter button width dimension
-    height: 42, // Counter button height dimension
-    borderRadius: 8, // Rounded button corners
-    alignItems: 'center', // Center icon horizontally
-    justifyContent: 'center' // Center icon vertically
-  },
+  counterBtn: { width: 42, height: 42, borderRadius: 8, alignItems: 'center', justifyContent: 'center' }, // Counter button style dimensions
   quantityText: { fontSize: 22, fontWeight: 'bold', color: '#ffffff', marginHorizontal: 28 }, // Quantity text display style
   summaryContainer: { 
     flexDirection: 'row', // Horizontal layout for summary elements
