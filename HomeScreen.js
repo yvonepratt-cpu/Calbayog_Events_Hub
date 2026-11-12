@@ -1,107 +1,111 @@
+import React, { useContext } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { BookingsContext } from './BookingsContext';
 
-import React from 'react'; // Import React core library
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native'; // Import core React Native UI components
-import { Ionicons } from '@expo/vector-icons'; // Import Ionicons vector icons library
+export default function HomeScreen({ navigation }) {
+  const { bookings } = useContext(BookingsContext);
 
-export default function HomeScreen({ navigation }) { // Define and export HomeScreen component receiving navigation prop
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}> {/* Root scrollable container view */}
-      <View style={styles.heroSection}> {/* Hero section wrapper */}
-        <View style={styles.iconCircle}> {/* Decorative icon background circle */}
-          <Ionicons name="calendar" size={40} color="#0066FF" /> {/* Calendar icon */}
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      <View style={styles.heroSection}>
+        <View style={styles.iconCircle}>
+          <Ionicons name="calendar" size={40} color="#0066FF" />
         </View>
-        <Text style={styles.heading}>Calbayog Events Hub</Text> {/* App heading title text */}
-        <Text style={styles.subheading}> {/* Subtitle description text */}
+        <Text style={styles.heading}>Calbayog Events Hub</Text>
+        <Text style={styles.subheading}>
           Your ultimate guide to local gigs, cultural festivals, and community gatherings across Calbayog City.
         </Text>
       </View>
 
-      <View style={styles.featuresContainer}> {/* Container holding feature cards */}
-        <TouchableOpacity 
-          style={styles.featureCard} // Feature card style container
-          onPress={() => navigation.navigate('Events')} // Navigate to Events screen on press
-          activeOpacity={0.7} // Active touch opacity feedback
+      <View style={styles.featuresContainer}>
+        <TouchableOpacity
+          style={styles.featureCard}
+          onPress={() => navigation.navigate('Events')}
+          activeOpacity={0.7}
         >
-          <Ionicons name="search-outline" size={24} color="#0066FF" /> {/* Search icon */}
-          <View style={styles.featureTextWrapper}> {/* Text wrapper view */}
-            <Text style={styles.featureTitle}>Browse & Search</Text> {/* Feature title text */}
-            <Text style={styles.featureDesc}>Instantly find events by name or venue location.</Text> {/* Feature description text */}
+          <Ionicons name="search-outline" size={24} color="#0066FF" />
+          <View style={styles.featureTextWrapper}>
+            <Text style={styles.featureTitle}>Browse & Search</Text>
+            <Text style={styles.featureDesc}>Instantly find events by name or venue location.</Text>
           </View>
-          <Ionicons name="chevron-forward" size={20} color="#64748b" /> {/* Right arrow icon */}
+          <Ionicons name="chevron-forward" size={20} color="#64748b" />
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={styles.featureCard} // Feature card style container
-          onPress={() => navigation.navigate('My Bookings')} // Navigate to My Bookings screen on press
-          activeOpacity={0.7} // Active touch opacity feedback
+        <TouchableOpacity
+          style={styles.featureCard}
+          onPress={() => navigation.navigate('My Bookings')}
+          activeOpacity={0.7}
         >
-          <Ionicons name="ticket-outline" size={24} color="#0066FF" /> {/* Ticket icon */}
-          <View style={styles.featureTextWrapper}> {/* Text wrapper view */}
-            <Text style={styles.featureTitle}>Secure Bookings</Text> {/* Feature title text */}
-            <Text style={styles.featureDesc}>Save ticket orders securely to your device storage.</Text> {/* Feature description text */}
+          <Ionicons name="ticket-outline" size={24} color="#0066FF" />
+          <View style={styles.featureTextWrapper}>
+            <Text style={styles.featureTitle}>
+              Secure Bookings ({bookings.length})
+            </Text>
+            <Text style={styles.featureDesc}>Save ticket orders securely to your device storage.</Text>
           </View>
-          <Ionicons name="chevron-forward" size={20} color="#64748b" /> {/* Right arrow icon */}
+          <Ionicons name="chevron-forward" size={20} color="#64748b" />
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity 
-        style={styles.button} // Main call-to-action button style
-        onPress={() => navigation.navigate('Events')} // Navigate to Events screen on press
-        activeOpacity={0.8} // Active touch opacity feedback
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('Events')}
+        activeOpacity={0.8}
       >
-        <Text style={styles.buttonText}>Explore Upcoming Events</Text> {/* Button label text */}
-        <Ionicons name="arrow-forward" size={20} color="#fff" style={styles.buttonIcon} /> {/* Arrow icon */}
+        <Text style={styles.buttonText}>Explore Upcoming Events</Text>
+        <Ionicons name="arrow-forward" size={20} color="#fff" style={styles.buttonIcon} />
       </TouchableOpacity>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0f172a' }, // Root container style with dark background
-  contentContainer: { padding: 24, justifyContent: 'center', alignItems: 'center', flexGrow: 1 }, // Scroll content layout container style
-  heroSection: { alignItems: 'center', marginBottom: 35, marginTop: 20 }, // Hero section spacing and alignment
+  container: { flex: 1, backgroundColor: '#0f172a' },
+  contentContainer: { padding: 24, justifyContent: 'center', alignItems: 'center', flexGrow: 1 },
+  heroSection: { alignItems: 'center', marginBottom: 35, marginTop: 20 },
   iconCircle: {
-    width: 80, // Circle width dimension
-    height: 80, // Circle height dimension
-    borderRadius: 40, // Circular border radius
-    backgroundColor: '#1e293b', // Circle background color
-    justifyContent: 'center', // Center icon vertically
-    alignItems: 'center', // Center icon horizontally
-    marginBottom: 16, // Bottom margin
-    borderWidth: 2, // Border width
-    borderColor: '#0066FF', // Border color
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#1e293b',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: '#0066FF',
   },
-  heading: { fontSize: 28, fontWeight: 'bold', textAlign: 'center', color: '#ffffff', marginBottom: 10 }, // Heading style
-  subheading: { fontSize: 15, color: '#94a3b8', textAlign: 'center', lineHeight: 22, paddingHorizontal: 10 }, // Subheading style
-  featuresContainer: { width: '100%', marginBottom: 35 }, // Features container style
-  featureCard: { 
-    flexDirection: 'row', // Horizontal layout for card elements
-    backgroundColor: '#1e293b', // Card background color
-    padding: 16, // Card inner padding
-    borderRadius: 12, // Rounded card corners
-    alignItems: 'center', // Center items vertically
-    marginBottom: 14, // Bottom margin spacing
-    borderWidth: 1, // Card border width
-    borderColor: '#334155', // Card border color
+  heading: { fontSize: 28, fontWeight: 'bold', textAlign: 'center', color: '#ffffff', marginBottom: 10 },
+  subheading: { fontSize: 15, color: '#94a3b8', textAlign: 'center', lineHeight: 22, paddingHorizontal: 10 },
+  featuresContainer: { width: '100%', marginBottom: 35 },
+  featureCard: {
+    flexDirection: 'row',
+    backgroundColor: '#1e293b',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: '#334155',
   },
-  featureTextWrapper: { marginLeft: 16, flex: 1 }, // Feature text wrapper style
-  featureTitle: { fontSize: 16, fontWeight: 'bold', color: '#ffffff' }, // Feature title text style
-  featureDesc: { fontSize: 13, color: '#94a3b8', marginTop: 2 }, // Feature description text style
-  button: { 
-    flexDirection: 'row', // Horizontal layout for text and icon
-    backgroundColor: '#0066FF', // Button background color
-    paddingVertical: 16, // Vertical padding
-    paddingHorizontal: 25, // Horizontal padding
-    borderRadius: 10, // Rounded button corners
-    alignItems: 'center', // Center items vertically
-    justifyContent: 'center', // Center items horizontally
-    width: '100%', // Full-width button style
-    shadowColor: '#0066FF', // Shadow color
-    shadowOffset: { width: 0, height: 4 }, // Shadow offset dimensions
-    shadowOpacity: 0.4, // Shadow opacity
-    shadowRadius: 8, // Shadow blur radius
-    elevation: 6, // Android shadow elevation
+  featureTextWrapper: { marginLeft: 16, flex: 1 },
+  featureTitle: { fontSize: 16, fontWeight: 'bold', color: '#ffffff' },
+  featureDesc: { fontSize: 13, color: '#94a3b8', marginTop: 2 },
+  button: {
+    flexDirection: 'row',
+    backgroundColor: '#0066FF',
+    paddingVertical: 16,
+    paddingHorizontal: 25,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    shadowColor: '#0066FF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 6,
   },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold', marginRight: 8 }, // Button text style
-  buttonIcon: { marginLeft: 4 }, // Button icon spacing style
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold', marginRight: 8 },
+  buttonIcon: { marginLeft: 4 },
 });

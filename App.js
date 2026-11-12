@@ -1,57 +1,111 @@
+import React, { useContext } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { BookingsContext } from './BookingsContext';
 
-import React from 'react'; // Import React core library
-import { NavigationContainer } from '@react-navigation/native'; // Import navigation state container
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'; // Import bottom tab navigator
-import { createNativeStackNavigator } from '@react-navigation/native-stack'; // Import native stack navigator
-import { Ionicons } from '@expo/vector-icons'; // Import vector icons library
+export default function HomeScreen({ navigation }) {
+  const { bookings } = useContext(BookingsContext);
 
-import HomeScreen from './HomeScreen'; // Import Home screen component
-import EventListScreen from './EventListScreen'; // Import Event list screen component
-import EventDetailsScreen from './EventDetailsScreen'; // Import Event details screen component
-import BuyTicketScreen from './BuyTicketScreen'; // Import Ticket purchase screen component
-import MyBookingsScreen from './MyBookingsScreen'; // Import Bookings screen component
-
-const Stack = createNativeStackNavigator(); // Initialize stack navigator instance
-const Tab = createBottomTabNavigator(); // Initialize bottom tab navigator instance
-
-function EventStack() {
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: { backgroundColor: '#1e293b' }, // Custom header background color
-        headerTintColor: '#ffffff', // Header text and icon tint color
-        headerTitleStyle: { fontWeight: 'bold' }, // Header title bold font weight style
-      }}
-    >
-      <Stack.Screen name="UpcomingEvents" component={EventListScreen} options={{ title: 'Explore Events' }} /> {/* Upcoming events screen */}
-      <Stack.Screen name="EventDetails" component={EventDetailsScreen} options={{ title: 'Event Details' }} /> {/* Event details screen */}
-      <Stack.Screen name="BuyTicket" component={BuyTicketScreen} options={{ title: 'Book Ticket' }} /> {/* Buy ticket screen */}
-    </Stack.Navigator>
-  );
-}
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      <View style={styles.heroSection}>
+        <View style={styles.iconCircle}>
+          <Ionicons name="calendar" size={40} color="#0066FF" />
+        </View>
+        <Text style={styles.heading}>Calbayog Events Hub</Text>
+        <Text style={styles.subheading}>
+          Your ultimate guide to local gigs, cultural festivals, and community gatherings across Calbayog City.
+        </Text>
+      </View>
 
-export default function App() {
-  return (
-    <NavigationContainer> {/* Wrap app within navigation container context */}
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          headerShown: false, // Hide default headers for bottom tab screens
-          tabBarStyle: { backgroundColor: '#1e293b', borderTopColor: '#334155' }, // Custom tab bar background and top border styling
-          tabBarActiveTintColor: '#0066FF', // Color tint for active tabs
-          tabBarInactiveTintColor: '#94a3b8', // Color tint for inactive tabs
-          tabBarIcon: ({ color, size }) => { // Configure dynamic tab bar icons based on route name
-            let iconName;
-            if (route.name === 'Home') iconName = 'home-outline';
-            else if (route.name === 'Events') iconName = 'calendar-outline';
-            else if (route.name === 'My Bookings') iconName = 'ticket-outline';
-            return <Ionicons name={iconName} size={size} color={color} />; // Return configured icon element
-          },
-        })}
+      <View style={styles.featuresContainer}>
+        <TouchableOpacity
+          style={styles.featureCard}
+          onPress={() => navigation.navigate('Events')}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="search-outline" size={24} color="#0066FF" />
+          <View style={styles.featureTextWrapper}>
+            <Text style={styles.featureTitle}>Browse & Search</Text>
+            <Text style={styles.featureDesc}>Instantly find events by name or venue location.</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color="#64748b" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.featureCard}
+          onPress={() => navigation.navigate('My Bookings')}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="ticket-outline" size={24} color="#0066FF" />
+          <View style={styles.featureTextWrapper}>
+            <Text style={styles.featureTitle}>
+              Secure Bookings ({bookings.length})
+            </Text>
+            <Text style={styles.featureDesc}>Save ticket orders securely to your device storage.</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color="#64748b" />
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('Events')}
+        activeOpacity={0.8}
       >
-        <Tab.Screen name="Home" component={HomeScreen} /> {/* Home tab screen */}
-        <Tab.Screen name="Events" component={EventStack} /> {/* Events tab wrapping the event stack */}
-        <Tab.Screen name="My Bookings" component={MyBookingsScreen} /> {/* Saved bookings tab screen */}
-      </Tab.Navigator>
-    </NavigationContainer>
+        <Text style={styles.buttonText}>Explore Upcoming Events</Text>
+        <Ionicons name="arrow-forward" size={20} color="#fff" style={styles.buttonIcon} />
+      </TouchableOpacity>
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#0f172a' },
+  contentContainer: { padding: 24, justifyContent: 'center', alignItems: 'center', flexGrow: 1 },
+  heroSection: { alignItems: 'center', marginBottom: 35, marginTop: 20 },
+  iconCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#1e293b',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: '#0066FF',
+  },
+  heading: { fontSize: 28, fontWeight: 'bold', textAlign: 'center', color: '#ffffff', marginBottom: 10 },
+  subheading: { fontSize: 15, color: '#94a3b8', textAlign: 'center', lineHeight: 22, paddingHorizontal: 10 },
+  featuresContainer: { width: '100%', marginBottom: 35 },
+  featureCard: {
+    flexDirection: 'row',
+    backgroundColor: '#1e293b',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: '#334155',
+  },
+  featureTextWrapper: { marginLeft: 16, flex: 1 },
+  featureTitle: { fontSize: 16, fontWeight: 'bold', color: '#ffffff' },
+  featureDesc: { fontSize: 13, color: '#94a3b8', marginTop: 2 },
+  button: {
+    flexDirection: 'row',
+    backgroundColor: '#0066FF',
+    paddingVertical: 16,
+    paddingHorizontal: 25,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    shadowColor: '#0066FF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold', marginRight: 8 },
+  buttonIcon: { marginLeft: 4 },
+});
