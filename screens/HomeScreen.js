@@ -6,6 +6,10 @@ import { BookingsContext } from './BookingsContext';
 export default function HomeScreen({ navigation }) {
   const { bookings } = useContext(BookingsContext);
 
+  const goToEvents = () => {
+    navigation.navigate('Events', { screen: 'UpcomingEvents' });
+  };
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <View style={styles.heroSection}>
@@ -21,7 +25,7 @@ export default function HomeScreen({ navigation }) {
       <View style={styles.featuresContainer}>
         <TouchableOpacity
           style={styles.featureCard}
-          onPress={() => navigation.navigate('Events')}
+          onPress={goToEvents}
           activeOpacity={0.7}
         >
           <Ionicons name="search-outline" size={24} color="#0066FF" />
@@ -50,7 +54,7 @@ export default function HomeScreen({ navigation }) {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('Events')}
+        onPress={goToEvents}
         activeOpacity={0.8}
       >
         <Text style={styles.buttonText}>Explore Upcoming Events</Text>
