@@ -41,6 +41,7 @@ export default function BuyTicketScreen({ route, navigation }) {
       unitPrice: event.numericPrice,
       totalPrice: `PHP ${totalPrice}`,
       bookingDate: formattedDateTime,
+      status: 'Confirmed',
       accentColor: activeColor,
     };
 
