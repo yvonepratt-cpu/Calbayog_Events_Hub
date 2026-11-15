@@ -10,7 +10,6 @@ export const BookingsProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // READ: Fetch saved bookings once when the provider mounts
   useEffect(() => {
     loadBookings();
   }, []);
@@ -32,7 +31,6 @@ export const BookingsProvider = ({ children }) => {
     }
   };
 
-  // CREATE: Add a new booking to storage and state
   const addBooking = async (newBooking) => {
     try {
       const updatedBookings = [newBooking, ...bookings];
@@ -45,29 +43,22 @@ export const BookingsProvider = ({ children }) => {
     }
   };
 
-  // UPDATE: Modify ticket quantity and recalculate total price for an existing booking
-  const updateBookingQuantity = async (bookingId, newQuantity) => {
-    if (newQuantity < 1) return;
+  const toggleBookingStatus = async (bookingId) => {
     try {
       const updatedBookings = bookings.map((item) => {
         if (item.id === bookingId) {
-          const unitPrice = item.unitPrice || parseInt(item.totalPrice.replace(/[^0-9]/g, ''), 10) / item.quantity;
-          return {
-            ...item,
-            quantity: newQuantity,
-            totalPrice: `PHP ${unitPrice * newQuantity}`,
-          };
+          const nextStatus = item.status === 'Checked In' ? 'Confirmed' : 'Checked In';
+          return { ...item, status: nextStatus };
         }
         return item;
       });
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedBookings));
       setBookings(updatedBookings);
     } catch (err) {
-      setError('Failed to update ticket quantity.');
+      setError('Failed to update booking status.');
     }
   };
 
-  // DELETE: Filter out a booking by ID and update storage
   const deleteBooking = async (bookingId) => {
     try {
       const updatedBookings = bookings.filter((item) => item.id !== bookingId);
@@ -86,7 +77,7 @@ export const BookingsProvider = ({ children }) => {
         error,
         loadBookings,
         addBooking,
-        updateBookingQuantity,
+        toggleBookingStatus,
         deleteBooking,
       }}
     >
