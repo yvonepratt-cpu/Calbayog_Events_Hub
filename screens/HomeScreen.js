@@ -14,7 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 
 // Used to access saved booking information
-import { BookingsContext } from './BookingsContext';
+import { BookingsContext } from './context/BookingsContext';
 
 // This function displays the main Home screen
 export default function HomeScreen({ navigation }) {
