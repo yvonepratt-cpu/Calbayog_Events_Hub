@@ -15,7 +15,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 
 // Used to access booking functions
-import { BookingsContext } from './BookingsContext';
+import { BookingsContext } from './context/BookingsContext';
 
 // This screen allows users to book event tickets
 export default function BuyTicketScreen({ route, navigation }) {
