@@ -16,14 +16,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
 
 // Stores and shares booking information
-import { BookingsProvider } from './BookingsContext';
+import { BookingsProvider } from './screens/context/BookingsContext';
 
 // Import all application screens
-import HomeScreen from './HomeScreen';
-import EventListScreen from './EventListScreen';
-import EventDetailsScreen from './EventDetailsScreen';
-import BuyTicketScreen from './BuyTicketScreen';
-import MyBookingsScreen from './MyBookingsScreen';
+import HomeScreen from './screens/HomeScreen';
+import EventListScreen from './screens/EventListScreen';
+import EventDetailsScreen from './screens/EventDetailsScreen';
+import BuyTicketScreen from './screens/BuyTicketScreen';
+import MyBookingsScreen from './screens/MyBookingsScreen';
 
 // Create bottom tabs and stack navigation
 const Tab = createBottomTabNavigator();
