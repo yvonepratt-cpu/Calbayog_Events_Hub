@@ -18,7 +18,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 
 // Import sample events and categories
-import { categories, initialEventsData } from './eventsData';
+import { categories, initialEventsData } from './data/eventsData';
 
 // Practice API used to demonstrate online data fetching
 // These are sample posts, not real Calbayog events
