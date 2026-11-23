@@ -1,123 +1,88 @@
-// Import the StyleSheet object from react-native for styling components
 import { StyleSheet } from 'react-native';
 
-// Export the styles object created using StyleSheet.create
+// Create reusable styles for different screens
 export const styles = StyleSheet.create({
 
-  // Main container layout styling for views
+  // Main container of the screen
   container: {
-    // Allows container to expand and fill available screen space
-    flex: 1,
-    // Adds inner padding around all sides of the container
-    padding: 20,
-    // Sets background color of container to white
-    backgroundColor: 'white'
+    flex: 1, // Fill the available screen space
+    padding: 20, // Add space inside the container
+    backgroundColor: 'white' // Set background to white
   },
 
-  // Header and title text style configuration
+  // Style of the main screen title
   title: {
-    // Sets font size for large title text
-    fontSize: 28,
-    // Applies bold font weight to title
-    fontWeight: 'bold',
-    // Adds spacing below the title text
-    marginBottom: 20
+    fontSize: 28, // Set the text size
+    fontWeight: 'bold', // Make the title bold
+    marginBottom: 20 // Add space below the title
   },
 
-  // Main content description text style configuration
+  // Style of the description text
   description: {
-    // Sets font size for description text
-    fontSize: 18,
-    // Adds spacing below the description block
-    marginBottom: 30
+    fontSize: 18, // Set description text size
+    marginBottom: 30 // Add space below the description
   },
 
-  // Primary interactive action button style configuration
+  // Style of the primary button
   button: {
-    // Sets primary button background color to blue
-    backgroundColor: 'blue',
-    // Adds inner padding around button label
-    padding: 15,
-    // Centers content horizontally inside the button
-    alignItems: 'center',
-    // Adds bottom margin separating it from adjacent components
-    marginBottom: 15
+    backgroundColor: 'blue', // Set button color to blue
+    padding: 15, // Add space inside the button
+    alignItems: 'center', // Center the button content
+    marginBottom: 15 // Add space below the button
   },
 
-  // Secondary or back action button style configuration
+  // Style of the back button
   backButton: {
-    // Sets background color of back button to gray
-    backgroundColor: 'gray',
-    // Adds inner padding around back button label
-    padding: 15,
-    // Centers text horizontally inside the button
-    alignItems: 'center'
+    backgroundColor: 'gray', // Set button color to gray
+    padding: 15, // Add space inside the button
+    alignItems: 'center' // Center the button content
   },
 
-  // Font styling for text inside buttons
+  // Style of the text inside buttons
   buttonText: {
-    // Sets button text color to white
-    color: 'white',
-    // Sets font size for button text
-    fontSize: 18
+    color: 'white', // Set text color to white
+    fontSize: 18 // Set button text size
   },
 
-  // Individual event card container item style
+  // Style of each event card
   eventItem: {
-    // Adds inner padding within the event card box
-    padding: 15,
-    // Sets border width around event item card
-    borderWidth: 1,
-    // Sets border color of event item card to gray
-    borderColor: 'gray',
-    // Adds bottom margin separating card from next list item
-    marginBottom: 10
+    padding: 15, // Add space inside the event card
+    borderWidth: 1, // Set border thickness
+    borderColor: 'gray', // Set border color
+    marginBottom: 10 // Add space between event cards
   },
 
-  // Title text style for individual event list items
+  // Style of the event title
   eventTitle: {
-    // Sets font size for event title
-    fontSize: 20,
-    // Applies bold text weight to event title
-    fontWeight: 'bold',
-    // Adds bottom margin below event title
-    marginBottom: 5
+    fontSize: 20, // Set event title size
+    fontWeight: 'bold', // Make event title bold
+    marginBottom: 5 // Add space below the title
   },
 
-  // Supporting body text style for event items
+  // Style of the event information
   eventText: {
-    // Sets font size for event info text
-    fontSize: 16,
-    // Adds small margin below each event text line
-    marginBottom: 3
+    fontSize: 16, // Set information text size
+    marginBottom: 3 // Add small space below the text
   },
 
-  // Ticket price display text style for event items
+  // Style of the ticket price
   eventPrice: {
-    // Sets font size for price text
-    fontSize: 16,
-    // Applies bold text weight to highlight price
-    fontWeight: 'bold',
-    // Adds spacing above the price display element
-    marginTop: 5
+    fontSize: 16, // Set ticket price text size
+    fontWeight: 'bold', // Make the price bold
+    marginTop: 5 // Add space above the price
   },
 
-  // General field label text style configuration
+  // Style of input labels
   label: {
-    // Sets font size for field labels
-    fontSize: 16,
-    // Applies bold text weight to labels
-    fontWeight: 'bold',
-    // Adds top margin above label text
-    marginTop: 10
+    fontSize: 16, // Set label text size
+    fontWeight: 'bold', // Make the label bold
+    marginTop: 10 // Add space above the label
   },
 
-  // Detail view text content style configuration
+  // Style of the event details text
   detail: {
-    // Sets font size for detail text entries
-    fontSize: 20,
-    // Adds bottom margin below detail text
-    marginBottom: 10
+    fontSize: 20, // Set details text size
+    marginBottom: 10 // Add space below each detail
   }
 
 });
