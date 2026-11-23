@@ -1,241 +1,597 @@
-import React, { useState, useEffect } from 'react';
 
+import React, { useEffect, useMemo, useState } from 'react';
+
+// Import components used to build the screen
 import {
-  View,
+  ActivityIndicator,
+  FlatList,
+  Image,
+  RefreshControl,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  FlatList,
-  StyleSheet,
-  ActivityIndicator,
-  Image,
+  View
 } from 'react-native';
 
+// Used to display icons
 import { Ionicons } from '@expo/vector-icons';
 
-// Demo API endpoint
-const API_URL = 'https://jsonplaceholder.typicode.com/posts?_limit=10';
+// Import sample events and categories
+import { categories, initialEventsData } from './eventsData';
 
+// Practice API used to demonstrate online data fetching
+// These are sample posts, not real Calbayog events
+const API_URL =
+  'https://jsonplaceholder.typicode.com/posts?_limit=5';
+
+// This screen displays the list of available events
 export default function EventListScreen({ navigation }) {
-  const [events, setEvents] = useState([]);
-  const [searchText, setSearchText] = useState('');
+
+  // Stores the text entered in the search bar
+  const [search, setSearch] = useState('');
+
+  // Stores the selected category (default is All)
+  const [category, setCategory] = useState('All');
+
+  // Stores the posts received from the online API
+  const [apiPosts, setApiPosts] = useState([]);
+
+  // Checks if API data is still loading
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
-  // Fetch events from the API
-  const fetchEvents = async () => {
-    try {
-      setLoading(true);
-      setError('');
+  // Checks if the user is refreshing the list
+  const [refreshing, setRefreshing] = useState(false);
 
-      const response = await fetch(API_URL);
+  // Stores an error message if API fetching fails
+  const [apiError, setApiError] = useState('');
 
-      if (!response.ok) {
-        throw new Error('Failed to load events.');
-      }
-
-      const data = await response.json();
-
-      // Convert API posts into event objects
-      const formattedEvents = data.map((item, index) => ({
-        id: String(item.id),
-        name: item.title,
-        date: `December ${index + 1}, 2026`,
-        venue: 'Calbayog City Events Center',
-        price: 'PHP 250',
-        numericPrice: 250,
-        category: 'Community',
-        image:
-          'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&q=80',
-        accentColor: '#3b82f6',
-      }));
-
-      setEvents(formattedEvents);
-    } catch (err) {
-      setError('Unable to load events. Please check your internet connection.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Run when the screen first appears
+  // Automatically fetch API data when the screen loads
   useEffect(() => {
-    fetchEvents();
+
+    // Allows the request to be cancelled
+    const controller = new AbortController();
+
+    // Load the online sample posts
+    loadApiPosts(controller.signal);
+
+    // Cancel the request when the screen is removed
+    return () => controller.abort();
+
   }, []);
 
-  // Search events by name or venue
-  const filteredEvents = events.filter((event) =>
-    event.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    event.venue.toLowerCase().includes(searchText.toLowerCase())
-  );
+  // This function gets sample posts from the online API
+  async function loadApiPosts(signal) {
 
-  // Display each event
-  const renderEvent = ({ item }) => (
-    <TouchableOpacity
-      style={styles.eventCard}
-      onPress={() =>
-        navigation.navigate('EventDetails', { event: item })
+    // Clear the previous error message
+    setApiError('');
+
+    try {
+
+      // Send a request to the API
+      const response = await fetch(API_URL, { signal });
+
+      // Check if the request was successful
+      if (!response.ok) {
+        throw new Error('Server returned ' + response.status);
       }
-    >
-      <Image source={{ uri: item.image }} style={styles.eventImage} />
 
-      <View style={styles.eventInfo}>
-        <Text style={styles.eventTitle}>{item.name}</Text>
+      // Convert the API response into JavaScript data
+      const data = await response.json();
 
-        <Text style={styles.eventText}>
-          <Ionicons name="calendar-outline" /> {item.date}
-        </Text>
+      // Check if the received data is an array
+      if (!Array.isArray(data)) {
+        throw new Error('Unexpected API response');
+      }
 
-        <Text style={styles.eventText}>
-          <Ionicons name="location-outline" /> {item.venue}
-        </Text>
+      // Store the received posts
+      setApiPosts(data);
 
-        <Text style={styles.price}>{item.price}</Text>
-      </View>
-    </TouchableOpacity>
-  );
+    } catch (error) {
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Upcoming Events</Text>
+      // Show an error if fetching fails
+      // Ignore errors caused by cancelling the request
+      if (error.name !== 'AbortError') {
+        setApiError(
+          'Could not load the online API demo. Check your internet connection.'
+        );
+      }
 
-      {/* Search Input */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search-outline" size={20} color="#94a3b8" />
+    } finally {
 
+      // Stop the loading and refreshing indicators
+      if (!signal || !signal.aborted) {
+        setLoading(false);
+        setRefreshing(false);
+      }
+    }
+  }
+
+  // This function refreshes the online API data
+  async function refresh() {
+
+    // Show the refreshing indicator
+    setRefreshing(true);
+
+    // Fetch the API data again
+    await loadApiPosts();
+  }
+
+  // Filter events based on search text and category
+  const filteredEvents = useMemo(() => {
+
+    // Check each event in the sample event list
+    return initialEventsData.filter(event => {
+
+      // Check if the event matches the selected category
+      const matchesCategory =
+        category === 'All' || event.category === category;
+
+      // Remove extra spaces and convert search to lowercase
+      const term = search.trim().toLowerCase();
+
+      // Check if the event name or venue matches the search
+      const matchesSearch =
+        event.name.toLowerCase().includes(term) ||
+        event.venue.toLowerCase().includes(term);
+
+      // Display only events that match both conditions
+      return matchesCategory && matchesSearch;
+
+    });
+
+  }, [search, category]);
+
+  // Header containing the search bar and category filters
+  const header = (
+    <View>
+
+      {/* Main screen title */}
+      <Text style={styles.heading}>
+        Explore Events
+      </Text>
+
+      {/* Short description below the title */}
+      <Text style={styles.subheading}>
+        Browse sample Calbayog events and choose a ticket.
+      </Text>
+
+      {/* Search bar container */}
+      <View style={styles.searchBox}>
+
+        {/* Search icon */}
+        <Ionicons
+          name="search-outline"
+          size={20}
+          color="#94a3b8"
+        />
+
+        {/* Input field for searching events */}
         <TextInput
-          style={styles.searchInput}
+          style={styles.input}
           placeholder="Search event name or venue..."
           placeholderTextColor="#94a3b8"
-          value={searchText}
-          onChangeText={setSearchText}
+          value={search}
+          onChangeText={setSearch}
+          accessibilityLabel="Search events"
         />
+
+        {/* Show clear button when search is not empty */}
+        {search.length > 0 && (
+          <TouchableOpacity
+            onPress={() => setSearch('')}
+            accessibilityLabel="Clear search"
+          >
+            {/* Clear search icon */}
+            <Ionicons
+              name="close-circle"
+              size={20}
+              color="#94a3b8"
+            />
+          </TouchableOpacity>
+        )}
+
       </View>
 
-      {/* Loading Indicator */}
-      {loading ? (
-        <ActivityIndicator size="large" color="#3b82f6" />
-      ) : error ? (
-        <View style={styles.messageContainer}>
-          <Text style={styles.errorText}>{error}</Text>
+      {/* Container for category filter buttons */}
+      <View style={styles.filters}>
 
+        {/* Create a button for every category */}
+        {categories.map(item => (
           <TouchableOpacity
-            style={styles.retryButton}
-            onPress={fetchEvents}
+            key={item}
+
+            // Change the selected category when clicked
+            onPress={() => setCategory(item)}
+
+            // Highlight the selected category
+            style={[
+              styles.filter,
+              category === item && styles.activeFilter
+            ]}
           >
-            <Text style={styles.buttonText}>Try Again</Text>
+            <Text
+              style={[
+                styles.filterText,
+                category === item && styles.activeFilterText
+              ]}
+            >
+              {item}
+            </Text>
+          </TouchableOpacity>
+        ))}
+
+      </View>
+
+      {/* Display the number of matching events */}
+      <Text style={styles.sectionTitle}>
+        Events ({filteredEvents.length})
+      </Text>
+
+    </View>
+  );
+
+  // Footer displaying the online API demonstration
+  const footer = (
+    <View style={styles.apiBox}>
+
+      {/* API section title */}
+      <Text style={styles.sectionTitle}>
+        Online API Fetching Demo
+      </Text>
+
+      {/* Explain that API posts are only sample data */}
+      <Text style={styles.note}>
+        These titles come from JSONPlaceholder, a practice API.
+        They are NOT real events or tickets.
+      </Text>
+
+      {/* Display loading, error, or API results */}
+      {loading ? (
+
+        // Show loading indicator while fetching data
+        <ActivityIndicator color="#60a5fa" />
+
+      ) : apiError ? (
+
+        // Display an error if fetching fails
+        <View>
+          <Text style={styles.error}>
+            {apiError}
+          </Text>
+
+          {/* Button to try fetching again */}
+          <TouchableOpacity
+            onPress={refresh}
+            style={styles.retry}
+          >
+            <Text style={styles.retryText}>
+              Try Again
+            </Text>
           </TouchableOpacity>
         </View>
+
       ) : (
-        <FlatList
-          data={filteredEvents}
-          keyExtractor={(item) => item.id}
-          renderItem={renderEvent}
-          ListEmptyComponent={
-            <Text style={styles.emptyText}>
-              No events found.
-            </Text>
-          }
-        />
+
+        // Display the titles received from the API
+        apiPosts.map(post => (
+          <Text key={post.id} style={styles.post}>
+            {'\u2022'} {post.title}
+          </Text>
+        ))
+
       )}
+
     </View>
+  );
+
+  // Main screen displaying the list of events
+  return (
+    <FlatList
+
+      // Apply the screen styles
+      style={styles.container}
+      contentContainerStyle={styles.content}
+
+      // Use the filtered events as the list data
+      data={filteredEvents}
+
+      // Give each event a unique key
+      keyExtractor={item => item.id}
+
+      // Display the search bar and category filters
+      ListHeaderComponent={header}
+
+      // Display the API demonstration at the bottom
+      ListFooterComponent={footer}
+
+      // Show a message when no events match
+      ListEmptyComponent={
+        <Text style={styles.empty}>
+          No events match your search.
+        </Text>
+      }
+
+      // Allow users to refresh by pulling down
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={refresh}
+          tintColor="#60a5fa"
+        />
+      }
+
+      // Display each event as a clickable card
+      renderItem={({ item }) => (
+        <TouchableOpacity
+          style={styles.card}
+
+          // Open the event details when clicked
+          onPress={() =>
+            navigation.navigate('EventDetails', {
+              event: item
+            })
+          }
+          activeOpacity={0.8}
+        >
+
+          {/* Display the event image */}
+          <Image
+            source={{ uri: item.image }}
+            style={styles.image}
+          />
+
+          {/* Container for event information */}
+          <View style={styles.cardBody}>
+
+            {/* Display the event category */}
+            <Text
+              style={[
+                styles.category,
+                { color: item.accentColor }
+              ]}
+            >
+              {item.category}
+            </Text>
+
+            {/* Display the event name */}
+            <Text style={styles.eventName}>
+              {item.name}
+            </Text>
+
+            {/* Display the event date */}
+            <Text style={styles.detail}>
+              <Ionicons name="calendar-outline" /> {item.date}
+            </Text>
+
+            {/* Display the event venue */}
+            <Text style={styles.detail}>
+              <Ionicons name="location-outline" /> {item.venue}
+            </Text>
+
+            {/* Bottom section for price and details link */}
+            <View style={styles.bottom}>
+
+              {/* Display the ticket price */}
+              <Text style={styles.price}>
+                {item.price}
+              </Text>
+
+              {/* Text indicating that details can be viewed */}
+              <Text style={styles.link}>
+                View Details ›
+              </Text>
+
+            </View>
+
+          </View>
+
+        </TouchableOpacity>
+      )}
+    />
   );
 }
 
+// Styles used to design the event list screen
 const styles = StyleSheet.create({
+
+  // Main screen background
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
-    padding: 16,
+    backgroundColor: '#0f172a'
   },
 
+  // Spacing around the screen content
+  content: {
+    padding: 18,
+    paddingBottom: 40
+  },
+
+  // Style of the Explore Events title
   heading: {
-    fontSize: 24,
+    color: '#fff',
+    fontSize: 26,
     fontWeight: 'bold',
-    color: '#ffffff',
-    marginBottom: 16,
+    marginTop: 12
   },
 
-  searchContainer: {
+  // Style of the description below the title
+  subheading: {
+    color: '#94a3b8',
+    marginTop: 5,
+    marginBottom: 18
+  },
+
+  // Design of the search bar
+  searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#1e293b',
-    paddingHorizontal: 12,
     borderRadius: 10,
-    marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#475569',
+    paddingHorizontal: 12
   },
 
-  searchInput: {
+  // Style of the search input
+  input: {
+    color: '#fff',
     flex: 1,
-    color: '#ffffff',
-    padding: 12,
-    fontSize: 15,
+    paddingVertical: 13,
+    paddingHorizontal: 9
   },
 
-  eventCard: {
+  // Arrange category buttons in rows
+  filters: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginVertical: 16
+  },
+
+  // Style of each category button
+  filter: {
+    paddingHorizontal: 15,
+    paddingVertical: 9,
+    borderRadius: 18,
     backgroundColor: '#1e293b',
-    borderRadius: 12,
-    marginBottom: 16,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#334155',
+    marginRight: 8,
+    marginBottom: 8
   },
 
-  eventImage: {
-    width: '100%',
-    height: 150,
+  // Background color of the selected category
+  activeFilter: {
+    backgroundColor: '#2563eb'
   },
 
-  eventInfo: {
-    padding: 15,
+  // Style of category button text
+  filterText: {
+    color: '#cbd5e1',
+    fontWeight: '600'
   },
 
-  eventTitle: {
-    color: '#ffffff',
+  // Text color of the selected category
+  activeFilterText: {
+    color: '#fff'
+  },
+
+  // Style of section titles
+  sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
+    color: '#fff',
+    marginBottom: 12
   },
 
-  eventText: {
+  // Design of each event card
+  card: {
+    borderRadius: 13,
+    overflow: 'hidden',
+    backgroundColor: '#1e293b',
+    borderWidth: 1,
+    borderColor: '#334155',
+    marginBottom: 16
+  },
+
+  // Size of the event image
+  image: {
+    width: '100%',
+    height: 145
+  },
+
+  // Spacing inside the event card
+  cardBody: {
+    padding: 15
+  },
+
+  // Style of the event category
+  category: {
+    fontWeight: 'bold',
+    fontSize: 12,
+    marginBottom: 5
+  },
+
+  // Style of the event name
+  eventName: {
+    fontSize: 19,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 9
+  },
+
+  // Style of event date and venue
+  detail: {
     color: '#cbd5e1',
-    marginBottom: 7,
-    fontSize: 14,
+    marginBottom: 5
   },
 
+  // Arrange price and details text horizontally
+  bottom: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+    alignItems: 'center'
+  },
+
+  // Style of the ticket price
   price: {
-    color: '#60a5fa',
+    color: '#4ade80',
     fontWeight: 'bold',
-    marginTop: 5,
+    fontSize: 17
   },
 
-  messageContainer: {
-    alignItems: 'center',
-    marginTop: 30,
+  // Style of the View Details text
+  link: {
+    color: '#93c5fd',
+    fontWeight: 'bold'
   },
 
-  errorText: {
-    color: '#f87171',
+  // Message displayed when no events match
+  empty: {
+    color: '#cbd5e1',
     textAlign: 'center',
-    marginBottom: 15,
+    padding: 22
   },
 
-  retryButton: {
+  // Design of the online API demonstration box
+  apiBox: {
+    backgroundColor: '#1e293b',
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 12
+  },
+
+  // Style of the API explanation
+  note: {
+    color: '#94a3b8',
+    lineHeight: 20,
+    marginBottom: 12
+  },
+
+  // Style of API error messages
+  error: {
+    color: '#fca5a5'
+  },
+
+  // Design of the Try Again button
+  retry: {
     backgroundColor: '#2563eb',
-    padding: 12,
+    padding: 10,
     borderRadius: 8,
+    marginTop: 12,
+    alignSelf: 'flex-start'
   },
 
-  buttonText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
+  // Style of the Try Again button text
+  retryText: {
+    color: '#fff',
+    fontWeight: 'bold'
   },
 
-  emptyText: {
-    color: '#ffffff',
-    textAlign: 'center',
-    marginTop: 30,
-  },
+  // Style of the titles received from the API
+  post: {
+    color: '#cbd5e1',
+    paddingVertical: 6,
+    textTransform: 'capitalize'
+  }
+
 });
